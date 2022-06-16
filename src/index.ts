@@ -1,1 +1,3 @@
-export * from './lib'
+import RBAC from './lib'
+
+export default RBAC

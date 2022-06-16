@@ -1,32 +1,30 @@
-import Permission from './Permission'
-import Role from './Role'
+import { IOptions, ListMap, RBACData } from '../types'
 
-type ListMap = Map<string, Array<string>>
-
-interface RBACData {
-  permissions: typeof Permission[]
-  roles: typeof Role[]
-}
-
-interface IOptions {
-  permissions?: ListMap
-  roles?: Array<string>
-  delimiter?: string
-}
+import Feature from './feature'
+import { isEmptyArray, isEmptyObject } from './helpers'
+import Permission from './permission'
+import Role from './role'
 
 const DEFAULT_OPTIONS: IOptions = {
-  permissions: new Map(),
+  permissions: {},
   roles: [],
+  features: [],
+  scopes: 0,
   delimiter: ':'
 }
 
-const RBAC = function (options: IOptions) {
+function RBAC (options: IOptions) {
   this.options = { ...DEFAULT_OPTIONS, ...options }
 }
 
 RBAC.prototype.init = function () {
-  const { roles, permissions } = this.options
-  this.create(roles, permissions)
+  const { roles, permissions, features } = this.options as IOptions
+
+  if (isEmptyArray(roles)) {
+    throw new Error('Roles are required')
+  }
+
+  this.create(roles, permissions, features)
 }
 
 /**
@@ -36,13 +34,23 @@ RBAC.prototype.init = function () {
  * @param {ListMap} permissionNames List of permission names
  */
 RBAC.prototype.create = function (
-  roleNames: Array<string>,
-  permissionNames: ListMap
+  roles: Array<string>,
+  permissions: ListMap,
+  features: typeof Feature[]
 ): RBACData {
   const initializedData: RBACData = {} as RBACData
 
-  initializedData.permissions = this.createPermissions(permissionNames)
-  initializedData.roles = this.createRoles(roleNames)
+  initializedData.roles = this.createRoles(roles)
+
+  if (permissions) {
+    initializedData.permissions = this.createPermissions(permissions)
+  }
+
+  if (features) {
+    initializedData.features = this.createFeatures(features)
+  }
+
+  console.log(initializedData)
 
   return initializedData
 }
@@ -58,7 +66,7 @@ RBAC.prototype.createPermissions = function (
   const initializedPermissions: any = {}
 
   Object.keys(permissionsData).map(resource => {
-    const actions = permissionsData.get(resource)
+    const actions = permissionsData[resource]
 
     actions &&
       actions.map(action => {
@@ -81,7 +89,7 @@ RBAC.prototype.createPermission = function (
   action: string,
   resource: string
 ): typeof Permission {
-  return new Permission(action, resource)
+  return new Permission(action, resource, this.options.delimiter)
 }
 
 /**

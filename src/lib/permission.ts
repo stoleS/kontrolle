@@ -1,5 +1,16 @@
-const Permission = function (action: string, resource: string) {
-  this.name = this.createName(action, resource, ':')
+const Permission = function (
+  action: string,
+  resource: string,
+  delimiter: string,
+  excluded = false,
+  version = ''
+) {
+  this.name = this.createName(action, resource, delimiter, excluded, version)
+  this.action = action
+  this.resource = resource
+
+  if (excluded) this.excluded = excluded
+  if (version) this.type = version
 }
 
 /**
@@ -29,7 +40,7 @@ Permission.prototype.createName = function (
     throw new Error('Resource is not defined')
   }
 
-  return `${action}${delimiter}${resource}`
+  return `${resource}${delimiter}${action}`
 }
 
 /**
