@@ -9,7 +9,6 @@ const DEFAULT_OPTIONS: IOptions = {
   permissions: {},
   roles: {},
   features: [],
-  scopes: 0,
   delimiter: ':'
 }
 
@@ -56,30 +55,30 @@ RBAC.prototype.create = function (
 
 /**
  * Create permissions from permission option parameter
- * @method RBAC#createPermissions
- * @param {ListMap} permissionsData Object of permissions
+ * @method RBAC#createFeatures
+ * @param {ListMap} featuresData Object of features
  */
-RBAC.prototype.createPermissions = function (
-  permissionsData: ListMap
+RBAC.prototype.createFeatures = function (
+  featuresData: ListMap
 ): typeof Permission[] {
-  const initializedPermissions: any = {}
+  const initializedFeatures: any = {}
 
-  for (const role in permissionsData) {
-    initializedPermissions[role] = []
-    if (Object.prototype.hasOwnProperty.call(permissionsData, role)) {
-      const permissions = permissionsData[role]
-      for (const group in permissions) {
-        if (Object.prototype.hasOwnProperty.call(permissions, group)) {
-          const permission = permissions[group]
-          permission.forEach(resource => {
-            initializedPermissions[role].push(`${group}:${resource}`)
+  for (const role in featuresData) {
+    initializedFeatures[role] = []
+    if (Object.prototype.hasOwnProperty.call(featuresData, role)) {
+      const features = featuresData[role]
+      for (const group in features) {
+        if (Object.prototype.hasOwnProperty.call(features, group)) {
+          const feature = features[group]
+          feature.forEach(resource => {
+            initializedFeatures[role].push(`${group}:${resource}`)
           })
         }
       }
     }
   }
 
-  return initializedPermissions
+  return initializedFeatures
 }
 
 /**
@@ -89,7 +88,7 @@ RBAC.prototype.createPermissions = function (
  * @param {String} resource Name of resource
  * @return {Permission}     Instance of the Permission
  */
-RBAC.prototype.createPermission = function (
+RBAC.prototype.createFeature = function (
   action: string,
   resource: string
 ): typeof Permission {
@@ -132,34 +131,41 @@ RBAC.prototype.createRole = function (name: string): typeof Role {
  * @method RBAC#createFeatures
  * @param {Array<string>} featureNames Array of feature objects
  */
-RBAC.prototype.createFeatures = function (
-  featuresData: Array<Record<string, any>>
-): Record<string, typeof Feature> {
-  const features: Record<string, typeof Feature> = {}
+RBAC.prototype.createPermissions = function (
+  permissionsData: Array<Record<string, any>>
+): Record<string, typeof Permission> {
+  const permissions: Record<string, typeof Permission> = {}
 
-  featuresData.forEach(featureGroup => {
-    for (const group in featureGroup) {
-      if (Object.prototype.hasOwnProperty.call(featureGroup, group)) {
-        const featuresList = featureGroup[group]
-        for (const feature in featuresList) {
-          if (Object.prototype.hasOwnProperty.call(featuresList, feature)) {
-            const rawFeature = featuresList[feature]
-            const parsedFeature = this.createFeature(group, feature, rawFeature)
+  permissionsData.forEach(permissionGroup => {
+    for (const group in permissionGroup) {
+      if (Object.prototype.hasOwnProperty.call(permissionGroup, group)) {
+        const permissionsList = permissionGroup[group]
+        for (const permission in permissionsList) {
+          if (
+            Object.prototype.hasOwnProperty.call(permissionsList, permission)
+          ) {
+            const rawPermission = permissionsList[permission]
+            const parsedPermission = this.createPermission(
+              group,
+              permission,
+              rawPermission
+            )
 
             if (
-              features[parsedFeature.name] &&
-              features[parsedFeature.name].access > rawFeature.access
+              rawPermission[parsedPermission.name] &&
+              rawPermission[parsedPermission.name].action ===
+                rawPermission.action
             )
               continue
 
-            features[parsedFeature.name] = parsedFeature
+            permissions[parsedPermission.name] = parsedPermission
           }
         }
       }
     }
   })
 
-  return features
+  return permissions
 }
 
 /**
@@ -168,16 +174,16 @@ RBAC.prototype.createFeatures = function (
  * @param {String} featureName Name of new Feature
  * @return {Feature}           Instance of the Feature
  */
-RBAC.prototype.createFeature = function (
+RBAC.prototype.createPermission = function (
   group: string,
   resource: string,
-  feature: Record<string, number | string>
-): typeof Feature {
-  return new Feature(
+  permission: Record<string, number | string>
+): typeof Permission {
+  return new Permission(
     group,
     resource,
-    feature.access as number,
-    feature.version as string,
+    permission.action as number,
+    permission.version as string,
     this.options.delimiter
   )
 }
@@ -201,18 +207,20 @@ RBAC.prototype.hasRole = function (name: string): typeof Role | boolean {
  * @method RBAC#can
  * @param {String} group    Name of the group
  * @param {String} resource Name of the resource
- * @param {Number} access   Access level
+ * @param {Number} action   Action
  * @return {boolean}
  */
 RBAC.prototype.can = function (
   group: string,
   resource: string,
-  access: number
+  action: number
 ) {
-  for (const featureKey in this.data.features) {
-    if (Object.prototype.hasOwnProperty.call(this.data.features, featureKey)) {
-      const feature = this.data.features[featureKey]
-      if (feature.can(group, resource, access)) {
+  for (const permissionKey in this.data.permissions) {
+    if (
+      Object.prototype.hasOwnProperty.call(this.data.permissions, permissionKey)
+    ) {
+      const permission = this.data.permissions[permissionKey]
+      if (permission.can(group, resource, action)) {
         return true
       }
     }
@@ -233,8 +241,8 @@ RBAC.prototype.canAll = function (
 
   for (let i = 0; i < permissions.length; i++) {
     const permission = permissions[i]
-    const { group, resource, access } = permission
-    const can = this.can(group, resource, access)
+    const { group, resource, action } = permission
+    const can = this.can(group, resource, action)
 
     if (can) found++
   }
@@ -253,8 +261,8 @@ RBAC.prototype.canAny = function (
 ): boolean {
   for (let i = 0; i < permissions.length; i++) {
     const permission = permissions[i]
-    const { group, resource, access } = permission
-    const can = this.can(group, resource, access)
+    const { group, resource, action } = permission
+    const can = this.can(group, resource, action)
 
     if (can) return true
   }
