@@ -21,7 +21,7 @@ export interface RBACData {
 
 export interface IOptions {
   permissions?: Record<string, Access>
-  roles?: Array<string>
+  roles?: Record<string, string>
   features?: Array<string>
   scopes?: Access
   delimiter?: string

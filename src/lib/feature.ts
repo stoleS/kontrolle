@@ -1,14 +1,14 @@
-import { Access } from '../types'
-
 const Feature = function (
-  name: string,
+  group: string,
   resource: string,
-  action: Access,
-  version = ''
-) {
-  this.name = name
+  access: number,
+  version = '',
+  delimiter: string
+): typeof Feature {
+  this.name = `${group}${delimiter}${resource}`
+  this.group = group
   this.resource = resource
-  this.action = action
+  this.access = access
   if (version) this.version = version
 }
 

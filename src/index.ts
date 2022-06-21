@@ -1,3 +1,4 @@
 import RBAC from './lib'
+import { Access } from './types'
 
-export default RBAC
+export { RBAC, Access }
