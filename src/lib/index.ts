@@ -51,8 +51,6 @@ RBAC.prototype.create = function (
     initializedData.features = this.createFeatures(features)
   }
 
-  console.log(initializedData)
-
   return initializedData
 }
 
@@ -198,10 +196,86 @@ RBAC.prototype.hasRole = function (name: string): typeof Role | boolean {
   return role
 }
 
+/**
+ * Check if user can perform an action over the feature
+ * @method RBAC#can
+ * @param {String} group    Name of the group
+ * @param {String} resource Name of the resource
+ * @param {Number} access   Access level
+ * @return {boolean}
+ */
 RBAC.prototype.can = function (
   group: string,
   resource: string,
-  action: number
-) {}
+  access: number
+) {
+  for (const featureKey in this.data.features) {
+    if (Object.prototype.hasOwnProperty.call(this.data.features, featureKey)) {
+      const feature = this.data.features[featureKey]
+      if (feature.can(group, resource, access)) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+/**
+ * Check if user can perform all provided actions over all provided features
+ * @method RBAC#canAll
+ * @param {Array<Record<any, any>>} permissions List of permissions to check
+ * @return {boolean}
+ */
+RBAC.prototype.canAll = function (
+  permissions: Array<Record<any, any>>
+): boolean {
+  let found = 0
+
+  for (let i = 0; i < permissions.length; i++) {
+    const permission = permissions[i]
+    const { group, resource, access } = permission
+    const can = this.can(group, resource, access)
+
+    if (can) found++
+  }
+
+  return found === permissions.length
+}
+
+/**
+ * Check if user can perform any provided actions over any provided features
+ * @method RBAC#canAny
+ * @param {Array<Record<any, any>>} permissions List of permissions to check
+ * @return {boolean}
+ */
+RBAC.prototype.canAny = function (
+  permissions: Array<Record<any, any>>
+): boolean {
+  for (let i = 0; i < permissions.length; i++) {
+    const permission = permissions[i]
+    const { group, resource, access } = permission
+    const can = this.can(group, resource, access)
+
+    if (can) return true
+  }
+
+  return false
+}
+
+/**
+ * Check if feature exists
+ * @method RBAC#hasFeature
+ * @param {String} group    Name of the group
+ * @param {String} resource Name of the resource
+ * @return {Feature}        Instance of the Feature
+ */
+RBAC.prototype.hasFeature = function (group: string, resource: string) {
+  const name = Feature.createName(group, resource, this.options.delimiter)
+  const feature = this.data.features[name]
+
+  if (!feature) return false
+
+  return feature
+}
 
 export default RBAC
