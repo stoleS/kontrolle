@@ -6,25 +6,31 @@ import Permission from './permission'
 import Role from './role'
 
 const DEFAULT_OPTIONS: IOptions = {
-  permissions: {},
+  permissions: [],
   roles: {},
   features: [],
   delimiter: ':'
 }
 
-function RBAC (options: IOptions) {
-  this.options = { ...DEFAULT_OPTIONS, ...options }
-  this.data = {}
+let initOptions: IOptions = {}
+
+let data = {
+  permissions: {},
+  features: {},
+  roles: {}
 }
 
-RBAC.prototype.init = function () {
-  const { roles, permissions, features } = this.options as IOptions
+const init = (options: IOptions) => {
+  initOptions = { ...DEFAULT_OPTIONS, ...options }
+  const { roles, permissions, features } = initOptions as IOptions
 
   if (isEmptyArray(roles)) {
     throw new Error('Roles are required')
   }
 
-  this.data = { ...this.create(roles, permissions, features) }
+  data = { ...create(roles, permissions, features) }
+
+  console.log(data)
 }
 
 /**
@@ -33,21 +39,21 @@ RBAC.prototype.init = function () {
  * @param {Array<string>} roleNames List of role names
  * @param {ListMap} permissionNames List of permission names
  */
-RBAC.prototype.create = function (
+const create = (
   roles: Record<string, string>,
-  permissions: ListMap,
+  permissions: Array<Record<string, any>>,
   features: typeof Feature[]
-): RBACData {
+): RBACData => {
   const initializedData: RBACData = {} as RBACData
 
-  initializedData.roles = this.createRoles(roles)
+  initializedData.roles = createRoles(roles)
 
   if (permissions) {
-    initializedData.permissions = this.createPermissions(permissions)
+    initializedData.permissions = createPermissions(permissions)
   }
 
   if (features) {
-    initializedData.features = this.createFeatures(features)
+    initializedData.features = createFeatures(features)
   }
 
   return initializedData
@@ -58,9 +64,9 @@ RBAC.prototype.create = function (
  * @method RBAC#createFeatures
  * @param {ListMap} featuresData Object of features
  */
-RBAC.prototype.createFeatures = function (
-  featuresData: ListMap
-): typeof Permission[] {
+const createFeatures = (
+  featuresData: typeof Feature[]
+): typeof Permission[] => {
   const initializedFeatures: any = {}
 
   for (const role in featuresData) {
@@ -88,11 +94,8 @@ RBAC.prototype.createFeatures = function (
  * @param {String} resource Name of resource
  * @return {Permission}     Instance of the Permission
  */
-RBAC.prototype.createFeature = function (
-  action: string,
-  resource: string
-): typeof Permission {
-  return new Permission(action, resource, this.options.delimiter)
+const createFeature = (action: string, resource: string): typeof Permission => {
+  return new Permission(action, resource, initOptions.delimiter)
 }
 
 /**
@@ -100,15 +103,15 @@ RBAC.prototype.createFeature = function (
  * @method RBAC#createRoles
  * @param {Array<string>} roleNames Array of role names
  */
-RBAC.prototype.createRoles = function (
+const createRoles = (
   rolesData: Record<string, string>
-): Record<string, typeof Role> {
+): Record<string, typeof Role> => {
   const roles: Record<string, typeof Role> = {}
 
   for (const role in rolesData) {
     if (Object.prototype.hasOwnProperty.call(rolesData, role)) {
       const rawRole = rolesData[role]
-      const parsedRole = this.createRole(rawRole)
+      const parsedRole = createRole(rawRole)
       roles[parsedRole.name] = parsedRole
     }
   }
@@ -122,7 +125,7 @@ RBAC.prototype.createRoles = function (
  * @param {String} roleName Name of new Role
  * @return {Role}           Instance of the Role
  */
-RBAC.prototype.createRole = function (name: string): typeof Role {
+const createRole = (name: string): typeof Role => {
   return new Role(name)
 }
 
@@ -131,9 +134,9 @@ RBAC.prototype.createRole = function (name: string): typeof Role {
  * @method RBAC#createFeatures
  * @param {Array<string>} featureNames Array of feature objects
  */
-RBAC.prototype.createPermissions = function (
+const createPermissions = (
   permissionsData: Array<Record<string, any>>
-): Record<string, typeof Permission> {
+): Record<string, typeof Permission> => {
   const permissions: Record<string, typeof Permission> = {}
 
   permissionsData.forEach(permissionGroup => {
@@ -145,7 +148,7 @@ RBAC.prototype.createPermissions = function (
             Object.prototype.hasOwnProperty.call(permissionsList, permission)
           ) {
             const rawPermission = permissionsList[permission]
-            const parsedPermission = this.createPermission(
+            const parsedPermission = createPermission(
               group,
               permission,
               rawPermission
@@ -174,17 +177,17 @@ RBAC.prototype.createPermissions = function (
  * @param {String} featureName Name of new Feature
  * @return {Feature}           Instance of the Feature
  */
-RBAC.prototype.createPermission = function (
+const createPermission = (
   group: string,
   resource: string,
   permission: Record<string, number | string>
-): typeof Permission {
-  return new Permission(
+): typeof Permission => {
+  return Permission(
     group,
     resource,
     permission.action as number,
     permission.version as string,
-    this.options.delimiter
+    initOptions.delimiter
   )
 }
 
@@ -194,8 +197,8 @@ RBAC.prototype.createPermission = function (
  * @param {String} name Name of the role
  * @return {Role}       Instance of the Role
  */
-RBAC.prototype.hasRole = function (name: string): typeof Role | boolean {
-  const role = this.data.roles[name]
+const hasRole = (name: string): typeof Role | boolean => {
+  const role = data.roles[name]
 
   if (!role) return false
 
@@ -210,16 +213,10 @@ RBAC.prototype.hasRole = function (name: string): typeof Role | boolean {
  * @param {Number} action   Action
  * @return {boolean}
  */
-RBAC.prototype.can = function (
-  group: string,
-  resource: string,
-  action: number
-) {
-  for (const permissionKey in this.data.permissions) {
-    if (
-      Object.prototype.hasOwnProperty.call(this.data.permissions, permissionKey)
-    ) {
-      const permission = this.data.permissions[permissionKey]
+const can = (group: string, resource: string, action: number) => {
+  for (const permissionKey in data.permissions) {
+    if (Object.prototype.hasOwnProperty.call(data.permissions, permissionKey)) {
+      const permission = data.permissions[permissionKey]
       if (permission.can(group, resource, action)) {
         return true
       }
@@ -234,17 +231,15 @@ RBAC.prototype.can = function (
  * @param {Array<Record<any, any>>} permissions List of permissions to check
  * @return {boolean}
  */
-RBAC.prototype.canAll = function (
-  permissions: Array<Record<any, any>>
-): boolean {
+const canAll = (permissions: Array<Record<any, any>>): boolean => {
   let found = 0
 
   for (let i = 0; i < permissions.length; i++) {
     const permission = permissions[i]
     const { group, resource, action } = permission
-    const can = this.can(group, resource, action)
+    const _can = can(group, resource, action)
 
-    if (can) found++
+    if (_can) found++
   }
 
   return found === permissions.length
@@ -256,15 +251,13 @@ RBAC.prototype.canAll = function (
  * @param {Array<Record<any, any>>} permissions List of permissions to check
  * @return {boolean}
  */
-RBAC.prototype.canAny = function (
-  permissions: Array<Record<any, any>>
-): boolean {
+const canAny = (permissions: Array<Record<any, any>>): boolean => {
   for (let i = 0; i < permissions.length; i++) {
     const permission = permissions[i]
     const { group, resource, action } = permission
-    const can = this.can(group, resource, action)
+    const _can = can(group, resource, action)
 
-    if (can) return true
+    if (_can) return true
   }
 
   return false
@@ -277,13 +270,22 @@ RBAC.prototype.canAny = function (
  * @param {String} resource Name of the resource
  * @return {Feature}        Instance of the Feature
  */
-RBAC.prototype.hasFeature = function (group: string, resource: string) {
-  const name = Feature.createName(group, resource, this.options.delimiter)
-  const feature = this.data.features[name]
+const hasFeature = (group: string, resource: string) => {
+  const name = Feature.createName(group, resource, initOptions.delimiter)
+  const feature = data.features[name]
 
   if (!feature) return false
 
   return feature
+}
+
+const RBAC = {
+  init,
+  can,
+  canAll,
+  canAny,
+  hasRole,
+  hasFeature
 }
 
 export default RBAC

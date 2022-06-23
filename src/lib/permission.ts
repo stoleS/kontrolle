@@ -1,44 +1,44 @@
-const Permission = function (
+const Permission = (
   group: string,
   resource: string,
   action: number,
   version = '',
   delimiter: string
-): typeof Permission {
-  this.name = this.createName(group, resource, delimiter)
-  this.group = group
-  this.resource = resource
-  this.action = action
-  if (version) this.version = version
-}
+): typeof Permission => {
+  const _group = group
+  const _resource = resource
+  const _action = action
+  const _version = version
 
-Permission.prototype.createName = function (
-  group: string,
-  resource: string,
-  delimiter: string
-) {
-  if (!delimiter) {
-    throw new Error('Delimiter is not defined')
+  const createName = (group: string, resource: string, delimiter: string) => {
+    if (!delimiter) {
+      throw new Error('Delimiter is not defined')
+    }
+
+    if (!group) {
+      throw new Error('Action is not defined')
+    }
+
+    if (!resource) {
+      throw new Error('Resource is not defined')
+    }
+    return `${group}${delimiter}${resource}`
   }
 
-  if (!group) {
-    throw new Error('Action is not defined')
+  const can = (group: string, resource: string, action: number): boolean => {
+    return _group === group && _resource === resource && _action === action
   }
 
-  if (!resource) {
-    throw new Error('Resource is not defined')
-  }
-  return `${group}${delimiter}${resource}`
-}
+  const _name = createName(group, resource, delimiter)
 
-Permission.prototype.can = function (
-  group: string,
-  resource: string,
-  action: number
-): boolean {
-  return (
-    this.group === group && this.resource === resource && this.action === action
-  )
+  return {
+    name: _name,
+    group: _group,
+    resource: _resource,
+    action: _action,
+    version: _version,
+    can
+  }
 }
 
 export default Permission

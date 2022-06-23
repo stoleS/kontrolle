@@ -5,15 +5,15 @@ import Role from '../lib/role'
 export type ListMap = Map<string, Array<string>>
 
 export interface RBACData {
-  permissions: typeof Permission[]
-  roles: typeof Role[]
+  permissions: Record<string, typeof Permission>
+  roles: Record<string, typeof Role>
   features: typeof Feature[]
 }
 
 export type Action = string | number | Array<number | string>
 
 export interface IOptions {
-  permissions?: Record<string, Action>
+  permissions?: Array<Record<string, any>>
   roles?: Record<string, string>
   features?: Array<string>
   delimiter?: string
