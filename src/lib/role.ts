@@ -1,5 +1,9 @@
-const Role = function (name: string) {
-  this.name = name
+/**
+ * Single feature object
+ */
+export function Role(name: string) {
+  const _name = name;
+  return {
+    name: _name
+  }
 }
-
-export default Role

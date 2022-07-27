@@ -1,32 +1,41 @@
-const Permission = (
+import { createName, isArray } from './helpers'
+
+/**
+ * Single permission object
+ */
+export function Permission (
   group: string,
   resource: string,
-  action: number,
+  action: string | string[],
   version = '',
   delimiter: string
-): typeof Permission => {
+) {
   const _group = group
   const _resource = resource
-  const _action = action
+  const _action = isArray(action) ? [...action] : action
   const _version = version
 
-  const createName = (group: string, resource: string, delimiter: string) => {
-    if (!delimiter) {
-      throw new Error('Delimiter is not defined')
-    }
-
-    if (!group) {
-      throw new Error('Action is not defined')
-    }
-
-    if (!resource) {
-      throw new Error('Resource is not defined')
-    }
-    return `${group}${delimiter}${resource}`
+  /**
+   * Evaluate single action
+   * @param {String} group    Feature group
+   * @param {String} resource Feature
+   * @param {String} action   Action to evaluate
+   * @return {Boolean}
+   */
+  const can = (group: string, resource: string, action: string): boolean => {
+    return (
+      _group === group && _resource === resource && _action.includes(action)
+    )
   }
 
-  const can = (group: string, resource: string, action: number): boolean => {
-    return _group === group && _resource === resource && _action === action
+  /**
+   * Evaluate multiple actions
+   * @param {String[]} actions List of actions to evaluate
+   */
+  const canActions = (actions: string[]) => {
+    let found = 0
+    actions.forEach(action => _action.includes(action) && found++)
+    return found
   }
 
   const _name = createName(group, resource, delimiter)
@@ -37,8 +46,7 @@ const Permission = (
     resource: _resource,
     action: _action,
     version: _version,
-    can
+    can,
+    canActions
   }
 }
-
-export default Permission
