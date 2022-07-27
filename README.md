@@ -12,6 +12,11 @@ This module works by defining a set of roles, permissions and features single us
 - [Usage](#usage)
 	- [Initialization](#initialization)
 	- [Evaluation](#evaluation)
+		- [can](#can)
+		- [canAny](#canAny)
+		- [canAll](#canAll)
+		- [canAnyAction](#canAnyAction)
+		- [canAllActions](#canAllActions)
 
 ## Instalation
 
@@ -51,7 +56,7 @@ const permissions = {
 		},
 	},
 	users: {
-		basic: {
+		manage: {
 			action: ['create', 'read', 'update']
 		}
 	}
@@ -64,7 +69,7 @@ const features = {
 	},
 	"usersAdmin":{
 	   "users":[
-	      "basic"
+	      "manage"
 	   ]
 	 }
 }
@@ -75,3 +80,98 @@ kontrolle.init({
 	features
 })
 ```
+
+### Evaluation
+Here are few examples on basic role and permission checks.
+
+#### can
+
+Evaluate if user can do an action over specified feature.
+
+```
+import * as kontrolle from 'kontrolle';
+
+const roles = ...
+const permissions = {
+	users: {
+		manage: {
+			action: ['create', 'read', 'update']
+		}
+	}
+}
+const features = ...
+
+kontrolle.init({ roles, permissions, features })
+
+const res = kontrolle.can('users', 'manage', 'create')
+// true
+
+const res = kontrolle.can('users', 'manage', 'delete')
+//false
+```
+&nbsp;
+#### canAny
+
+Evaluate if user can do any of the provided evaluations.
+
+```
+import * as kontrolle from 'kontrolle';
+
+const roles = ...
+const permissions = {
+	users: {
+		manage: {
+			action: ['create', 'read', 'update']
+		},
+		licence: {
+			action: ['view']
+		}
+	}
+}
+const features = ...
+
+kontrolle.init({ roles, permissions, features })
+
+const res = kontrolle.canAny(['users', 'manage', 'read'], ['users', 'licence', 'view'])
+// true
+
+const res = kontrolle.canAny(['users', 'manage', '*'], ['users', 'licence', 'view'])
+// true
+
+const res = kontrolle.canAny(['users', 'manage', '*'], ['users', 'licence', 'update'])
+// false
+```
+&nbsp;
+#### canAll
+
+Evaluate if user can do all of the provided evaluations.
+
+```
+import * as kontrolle from 'kontrolle';
+
+const roles = ...
+const permissions = {
+	users: {
+		manage: {
+			action: ['create', 'read', 'update']
+		},
+		licence: {
+			action: ['view']
+		}
+	}
+}
+const features = ...
+
+kontrolle.init({ roles, permissions, features })
+
+const res = kontrolle.canAny(['users', 'manage', 'read'], ['users', 'licence', 'view'])
+// true
+
+const res = kontrolle.canAny(['users', 'manage', '*'], ['users', 'licence', 'view'])
+// false
+```
+&nbsp;
+#### canAnyAction
+&nbsp;
+#### canAllActions
+
