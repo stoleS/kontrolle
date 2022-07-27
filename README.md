@@ -17,7 +17,7 @@ This module works by defining a set of roles, permissions and features single us
 
 This module is distributed via [npm](https://www.npmjs.com/) which is bundled with [node](https://nodejs.org/en/) and should be installed as one of your project's `dependencies`:
 ```
-npm install --save rbac
+npm install --save kontrolle
 ```
 
 ## Test
