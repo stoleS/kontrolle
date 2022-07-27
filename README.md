@@ -41,7 +41,7 @@ npm run doc
 
 Here's a simple example of library initialization:
 ```
-import * as RBAC from 'rbac';
+import * as kontrolle from 'kontrolle';
 
 const roles = ['userAdmin', 'agencyAdmin'];
 const permissions = {
@@ -69,7 +69,7 @@ const features = {
 	 }
 }
 
-RBAC.init({
+kontrolle.init({
 	roles,
 	permissions,
 	features

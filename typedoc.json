@@ -7,11 +7,11 @@
     "src/index.ts"
   ],
   "entryPointStrategy": "Expand",
-  "out": "public/docs",
+  "out": "docs/",
   "plugin": [
     "typedoc-theme-hierarchy"
   ],
   "theme": "hierarchy",
   "tsconfig": "./tsconfig.json",
-  "name": "RBAC"
+  "name": "kontrolle"
 }

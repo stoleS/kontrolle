@@ -1,4 +1,4 @@
-/** @module RBAC */
+/** @module kontrolle */
 
 import { IOptions, RBACData } from '../types';
 

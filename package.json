@@ -1,5 +1,5 @@
 {
-  "name": "rbac",
+  "name": "kontrolle",
   "version": "1.0.0",
   "description": "description",
   "main": "build/main/index.js",
@@ -30,8 +30,8 @@
     "cov:lcov": "nyc report --reporter=lcov",
     "cov:send": "run-s cov:lcov && codecov",
     "cov:check": "nyc report && nyc check-coverage --lines 100 --functions 100 --branches 100",
-    "doc": "run-s doc:html && open-cli build/docs/index.html",
-    "doc:html": "typedoc --out build/docs",
+    "doc": "run-s doc:html && open-cli docs/index.html",
+    "doc:html": "typedoc",
     "doc:json": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --json build/docs/typedoc.json",
     "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
     "version": "standard-version",
