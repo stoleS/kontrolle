@@ -25,7 +25,7 @@ export interface IOptions {
    * Initial permissions array
    * @example
    * ```
-   * users: { manage: { action: ['create']} }
+   * users: { manage: { action: ['create'] } }
    * ``` 
    * */
   permissions?: Array<Record<string, any>>
