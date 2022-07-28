@@ -14,11 +14,17 @@ Check the [documentation](https://stoles.github.io/kontrolle) for extended infor
 - [Usage](#usage)
 	- [Initialization](#initialization)
 	- [Evaluation](#evaluation)
-		- [can](#can)
-		- [canAny](#canany)
-		- [canAll](#canall)
-		- [canAnyAction](#cananyaction)
-		- [canAllActions](#canallactions)
+		- [Permissions](#permissions)
+			- [can](#can)
+			- [canAny](#canany)
+			- [canAll](#canall)
+			- [canAnyAction](#cananyaction)
+			- [canAllActions](#canallactions)
+		- [Roles](#roles)
+			- [hasRole](#hasrole)
+			- [hasAnyRole](#hasanyrole)
+			- [hasAllRoles](#hasallroles)
+		- [Extras](#extras)
 
 ## Instalation
 
@@ -85,6 +91,8 @@ kontrolle.init({
 
 ### Evaluation
 Here are few examples on basic role and permission checks.
+
+### Permissions
 
 #### can
 
@@ -231,5 +239,67 @@ const res = kontrolle.canAllActions('users', 'manage', ['create', 'read'])
 // true
 
 const res = kontrolle.canAllActions('users', 'manage', ['delete', 'read'])
+// false
+```
+
+### Roles
+
+#### hasRole
+
+Check if user has a provided role
+
+```
+import * as kontrolle from 'kontrolle';
+
+const roles = ['userAdmin', 'agencyAdmin'];
+const permissions = ...
+const features = ...
+
+kontrolle.init({ roles, permissions, features })
+
+const res = kontrolle.hasRole('userAdmin')
+// role object { name: 'userAdmin' }
+
+const res = kontrolle.hasRole('superadmin')
+// false
+```
+&nbsp;
+#### hasAnyRole
+
+Check if user has any of the provided roles
+
+```
+import * as kontrolle from 'kontrolle';
+
+const roles = ['userAdmin', 'agencyAdmin'];
+const permissions = ...
+const features = ...
+
+kontrolle.init({ roles, permissions, features })
+
+const res = kontrolle.hasAnyRole(['userAdmin', 'superadmin'])
+// true
+
+const res = kontrolle.hasAnyRole(['marketing', 'qa']);
+// false
+```
+&nbsp;
+#### hasAllRoles
+
+Check if user has all of the provided roles
+
+```
+import * as kontrolle from 'kontrolle';
+
+const roles = ['userAdmin', 'agencyAdmin'];
+const permissions = ...
+const features = ...
+
+kontrolle.init({ roles, permissions, features })
+
+const res = kontrolle.hasAllRoles(['userAdmin', 'agencyAdmin'])
+// true
+
+const res = kontrolle.hasAnyRole(['userAdmin', 'superadmin']);
 // false
 ```
