@@ -9,9 +9,13 @@
   "entryPointStrategy": "Expand",
   "out": "docs/",
   "plugin": [
-    "typedoc-theme-hierarchy"
+    "typedoc-theme-hierarchy",
+    "typedoc-plugin-coverage"
   ],
   "theme": "hierarchy",
   "tsconfig": "./tsconfig.json",
-  "name": "kontrolle"
+  "name": "kontrolle",
+  "validation": {
+    "notDocumented": true
+  }
 }

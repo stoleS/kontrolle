@@ -9,7 +9,7 @@ import { Role } from './role';
 export const DEFAULT_OPTIONS: IOptions = {
   permissions: [],
   roles: {},
-  features: [],
+  features: {},
   delimiter: ':',
 };
 
@@ -47,7 +47,7 @@ export const init = (options: IOptions) => {
 export const create = (
   roles: Record<string, string>,
   permissions: Array<Record<string, any>>,
-  features: Array<Record<string, Array<string>>>
+  features: Record<string, Record<string, Array<string>>>
 ): RBACData => {
   const initializedData: RBACData = {} as RBACData;
 
@@ -70,7 +70,7 @@ export const create = (
  * @param {ListMap} featuresData Object of features
  */
 export const createFeatures = (
-  featuresData: Array<Record<string, Array<string>>>
+  featuresData: Record<string, Record<string, Array<string>>>
 ) => {
   const initializedFeatures: any = {};
 
@@ -130,7 +130,7 @@ export const createRole = (name: string) => {
  */
 export const createPermissions = (
   permissionsData: Array<Record<string, any>>
-): Record<string, typeof Permission> => {
+): Record<string, any> => {
   const permissions: Record<string, any> = {};
 
   permissionsData.forEach((permissionGroup) => {
@@ -171,13 +171,13 @@ export const createPermissions = (
  * @param {String} group                      Permission group
  * @param {String} resource                   Permission name
  * @param {Record<string, string>} permission Permission options
- * @return {Permission}                       Instance of the Permission
+ * @return {Record<string, any>}              Instance of the Permission
  */
 export const createPermission = (
   group: string,
   resource: string,
   permission: Record<string, string>
-) => {
+): Record<string, any> => {
   return Permission(
     group,
     resource,
