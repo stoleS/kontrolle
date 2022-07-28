@@ -2,6 +2,8 @@
 
 This module works by defining a set of roles, permissions and features single user has and checking to see if a said user possesses a certain capability, either by checking if specific role exists or feature is available. This allows you to determine whether a user should have access to a given resource or operation. Features can be extended with specific variations (like alpha or beta) that can be further checked at evaluation. The module is written in Typescript and compiles to commonjs.
 
+Check the [documentation](https://stoles.github.io/kontrolle) for extended information about methods and usage.
+
 
 ## Table of Contents
 
