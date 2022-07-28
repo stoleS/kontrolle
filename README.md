@@ -62,13 +62,13 @@ const permissions = {
 	}
 }
 const features = {
-	"agencyAdmin":{
-	   "agencies":[
+	"agencyAdmin": {
+	   "agencies": [
 	      "basic"
 	   ]
 	},
-	"usersAdmin":{
-	   "users":[
+	"usersAdmin": {
+	   "users": [
 	      "manage"
 	   ]
 	 }
@@ -172,6 +172,62 @@ const res = kontrolle.canAny(['users', 'manage', '*'], ['users', 'licence', 'vie
 ```
 &nbsp;
 #### canAnyAction
+
+Evalute if user can do any of the provided actions over the feature
+
+```
+import * as kontrolle from 'kontrolle';
+
+const roles = ...
+const permissions = {
+	users: {
+		manage: {
+			action: ['create', 'read', 'update']
+		},
+		licence: {
+			action: ['view']
+		}
+	}
+}
+const features = ...
+
+kontrolle.init({ roles, permissions, features })
+
+const res = kontrolle.canAnyAction('users', 'manage', ['create', 'read'])
+// true
+
+const res = kontrolle.canAnyAction('users', 'manage', ['delete', 'read'])
+// true
+
+const res = kontrolle.canAnyAction('users', 'manage', ['delete', 'assign'])
+// false
+```
 &nbsp;
 #### canAllActions
 
+Evalute if user can do all of the provided actions over the feature
+
+```
+import * as kontrolle from 'kontrolle';
+
+const roles = ...
+const permissions = {
+	users: {
+		manage: {
+			action: ['create', 'read', 'update']
+		},
+		licence: {
+			action: ['view']
+		}
+	}
+}
+const features = ...
+
+kontrolle.init({ roles, permissions, features })
+
+const res = kontrolle.canAllActions('users', 'manage', ['create', 'read'])
+// true
+
+const res = kontrolle.canAllActions('users', 'manage', ['delete', 'read'])
+// false
+```

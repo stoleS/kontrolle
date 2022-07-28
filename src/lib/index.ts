@@ -268,7 +268,7 @@ export const canAny = (permissions: Array<Record<any, any>>): boolean => {
  * @method RBAC#canAllActions
  * @param {String} group    Name of the group
  * @param {String} resource Name of the resource
- * @param {String} actions     List of actions
+ * @param {String} actions  List of actions
  * @return {boolean}
  */
 export const canAllActions = (
@@ -284,6 +284,28 @@ export const canAllActions = (
   }
 
   return _can === actions.length ? true : false;
+};
+
+/**
+ * Check if user can perform any provided action over the feature
+ * @method RBAC#canAllActions
+ * @param {String} group    Name of the group
+ * @param {String} resource Name of the resource
+ * @param {String} actions  List of actions
+ * @return {boolean}
+ */
+export const canAnyAction = (
+  group: string,
+  resource: string,
+  actions: string[]
+): boolean => {
+  const encodedName = createName(group, resource, initOptions.delimiter);
+
+  if (Object.prototype.hasOwnProperty.call(data.permissions, encodedName)) {
+    return data.permissions[encodedName].canActions(actions) > 0 && true;
+  }
+
+  return false;
 };
 
 /**
