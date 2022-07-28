@@ -303,3 +303,5 @@ const res = kontrolle.hasAllRoles(['userAdmin', 'agencyAdmin'])
 const res = kontrolle.hasAnyRole(['userAdmin', 'superadmin']);
 // false
 ```
+
+### Extras
