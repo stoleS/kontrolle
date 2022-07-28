@@ -188,7 +188,7 @@ export const createPermission = (
 };
 
 /**
- * Check if role exists
+ * Check if user has a provided role
  * @method RBAC#hasRole
  * @param {String} name     Name of the role
  * @return {Role | boolean} Instance of the Role or false if role doesn't exist
@@ -201,6 +201,39 @@ export const hasRole = (name: string): typeof Role | boolean => {
   }
 
   return false;
+};
+
+/**
+ * Check if user has any of the provided roles
+ * @method RBAC#hasAnyRole
+ * @param {Array<String>} roles List of role names to check
+ * @return {boolean}
+ */
+export const hasAnyRole = (roles: string[]): boolean => {
+  for (const roleKey in data.roles) {
+    if (Object.prototype.hasOwnProperty.call(data.roles, roleKey)) {
+      const role = data.roles[roleKey];
+      if (roles.includes(role.name)) return true;
+    }
+  }
+  return false;
+};
+
+/**
+ * Check if user has all of the provided roles
+ * @method RBAC#hasAllRoles
+ * @param {Array<String>} roles List of role names to check
+ * @return {boolean}
+ */
+export const hasAllRoles = (roles: string[]): boolean => {
+  let _has = 0;
+  for (const roleKey in data.roles) {
+    if (Object.prototype.hasOwnProperty.call(data.roles, roleKey)) {
+      const role = data.roles[roleKey];
+      if (roles.includes(role.name)) _has++;
+    }
+  }
+  return _has === roles.length;
 };
 
 /**
