@@ -13,10 +13,10 @@ This module works by defining a set of roles, permissions and features single us
 	- [Initialization](#initialization)
 	- [Evaluation](#evaluation)
 		- [can](#can)
-		- [canAny](#canAny)
-		- [canAll](#canAll)
-		- [canAnyAction](#canAnyAction)
-		- [canAllActions](#canAllActions)
+		- [canAny](#canany)
+		- [canAll](#canall)
+		- [canAnyAction](#cananyaction)
+		- [canAllActions](#canallactions)
 
 ## Instalation
 
