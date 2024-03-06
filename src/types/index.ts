@@ -1,10 +1,10 @@
-export type ACLRulesMap = Record<string, Fn>;
+export type KontrolleRulesMap = Record<string, Fn>;
 export type Rule = {
   readonly rules: string | readonly string[];
   readonly requirement: Fn;
 };
 export type Rules = NonEmptyArray<Rule>;
-export type ACLRules = {
+export type KontrolleRules = {
   readonly permissions: Rules;
   readonly roles?: Rules;
 };
@@ -15,7 +15,7 @@ export type RuleArgs = readonly any[];
 export type User = {
   readonly [key: string]: any;
 };
-export type ACLState<U = User> = {
+export type KontrolleState<U = User> = {
   user: U | null;
-  readonly rulesMap: ACLRulesMap;
+  readonly rulesMap: KontrolleRulesMap;
 };

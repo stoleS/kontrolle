@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { ACL, defineACL, defineRules } from './acl';
+import { defineKontrolle, defineRules, Kontrolle } from './kontrolle';
 
 const user: UserType = {
   id: 1,
@@ -48,9 +48,9 @@ test('defineACL', (t) => {
     roles: [{ rules: 'admin', requirement: (user: UserType) => user.isAdmin }],
   });
 
-  defineACL(user, rules);
+  defineKontrolle(user, rules);
 
-  const res = ACL.can(['delete-certificate'], certificate);
+  const res = Kontrolle.can(['delete-certificate'], certificate);
 
   t.is(res, true);
 });

@@ -1,20 +1,27 @@
-import type { ACLRules, ACLState, Fn, RuleArgs, User } from '../types';
+import type {
+  Fn,
+  KontrolleRules,
+  KontrolleState,
+  Rule,
+  RuleArgs,
+  User,
+} from '../types';
 
 import { _error } from './log';
 
 /**
- * @namespace ACL
+ * @namespace Kontrolle
  */
 
 /**
  * Represents internal state used for storing
  * user data used for evaluation and mapped rules
- * @typedef {object} ACLState
- * @memberOf ACL
+ * @typedef {object} KontrolleState
+ * @memberOf Kontrolle
  * @property {User} user - user provided in the initialization step
- * @property {ACLRules} rulesMap - flattened list of all rules with corresponding eval method
+ * @property {KontrolleRules} rulesMap - flattened list of all rules with corresponding eval method
  */
-const _ACL: ACLState = {
+const _Kontrolle: KontrolleState = {
   user: null,
   rulesMap: {},
 };
@@ -22,7 +29,7 @@ const _ACL: ACLState = {
 /**
  * Evaluates that all provided rules are satisfied.
  *
- * @memberOf ACL
+ * @memberOf Kontrolle
  * @param {string | string[]} rules - List of rules for evaluation.
  * @param {unknown[]} args - Arguments used for multiple property evaluation.
  * @returns {boolean} Are all rules satisfied.
@@ -36,7 +43,7 @@ function canRuleChecker(rules: string | string[], ...args: readonly unknown[]) {
 /**
  * Evaluates that some of the provided rules are satisfied.
  *
- * @memberOf ACL
+ * @memberOf Kontrolle
  * @param {string | string[]} rules - List of rules for evaluation.
  * @param {unknown[]} args - Arguments used for multiple property evaluation.
  * @returns {boolean} Is any rule satisfied.
@@ -53,7 +60,7 @@ function canAnyRuleChecker(
 /**
  * Evaluates that all of the provided rules are not satisfied.
  *
- * @memberOf ACL
+ * @memberOf Kontrolle
  * @param {string | string[]} rules - List of rules for evaluation.
  * @param {unknown[]} args - Arguments used for multiple property evaluation.
  * @returns {boolean} All rules not satisfied.
@@ -67,7 +74,7 @@ function notRuleChecker(rules: string | string[], ...args: readonly unknown[]) {
 /**
  * Evaluates that some of the provided rules are not satisfied.
  *
- * @memberOf ACL
+ * @memberOf Kontrolle
  * @param {string | string[]} rules - List of rules for evaluation.
  * @param {unknown[]} args - Arguments used for multiple property evaluation.
  * @returns {boolean} Some rules not satisfied.
@@ -84,7 +91,7 @@ function notAnyRuleChecker(
 /**
  * Evaluates rule/s.
  *
- * @memberOf ACL
+ * @memberOf Kontrolle
  * @param {string | string[]} rules - List of rules for evaluation.
  * @param {unknown[]} args - Arguments used for multiple property evaluation.
  * @returns {[number, number], false} Number of rules tested and rules passed
@@ -94,13 +101,13 @@ function ruleChecker(
   ...args: readonly unknown[]
 ): [number, number] | false {
   if (typeof rules === 'string') {
-    if (!(rules in _ACL.rulesMap)) {
+    if (!(rules in _Kontrolle.rulesMap)) {
       _error(
         `Rule *${rules}* doesn't exist. Please define it in the config file.`
       );
       return false;
     }
-    const callback = _ACL.rulesMap[rules];
+    const callback = _Kontrolle.rulesMap[rules];
     return evaluateRuleCallback(callback, ...args);
   }
 
@@ -109,13 +116,13 @@ function ruleChecker(
     let valid = 0;
 
     rules.forEach((rule) => {
-      if (!(rule in _ACL.rulesMap)) {
+      if (!(rule in _Kontrolle.rulesMap)) {
         _error(
           `Rule *${rules}* doesn't exist. Please define it in the config file.`
         );
         return;
       }
-      const callback = _ACL.rulesMap[rule];
+      const callback = _Kontrolle.rulesMap[rule];
       const res = evaluateRuleCallback(callback, ...args);
 
       if (res) valid++;
@@ -131,7 +138,7 @@ function ruleChecker(
 /**
  * Evaluates that provided callbacks satisfy defined rules.
  *
- * @memberOf ACL
+ * @memberOf Kontrolle
  * @param {Fn} callback - callback function used for evaluation.
  * @param {unknown[]} args - Arguments used for multiple property evaluation.
  * @returns {[number, number] | boolean} Result of evaluation.
@@ -147,17 +154,17 @@ function evaluateRuleCallback(
     }
 
     if (!args) {
-      return callback(_ACL.user);
+      return callback(_Kontrolle.user);
     }
 
     if (Array.isArray(args)) {
-      return callback(_ACL.user, ...args);
+      return callback(_Kontrolle.user, ...args);
     }
 
-    return callback(_ACL.user, args);
+    return callback(_Kontrolle.user, args);
   } catch (error) {
     _error(
-      'Some of defined ACL rules require additional argument(s) that are missing from the evaluation check.'
+      'Some of defined Kontrolle rules require additional argument(s) that are missing from the evaluation check.'
     );
     _error(error);
     return false;
@@ -167,20 +174,20 @@ function evaluateRuleCallback(
 /**
  * Parse single rule and add it to the rules map
  *
- * @memberOf ACL
+ * @memberOf Kontrolle
  * @param {string} rule - Rule to add to the rules map.
  * @param {Fn} requirement - Evaluation callback.
  * @returns {void}
  */
 function applyRule(rule: string, requirement: Fn) {
-  if (_ACL.rulesMap[rule]) _error(`Rule ${rule} already exists.`);
-  else _ACL.rulesMap[rule] = requirement;
+  if (_Kontrolle.rulesMap[rule]) _error(`Rule ${rule} already exists.`);
+  else _Kontrolle.rulesMap[rule] = requirement;
 }
 
 /**
  * Parse multiple rules and add them to the rules map
  *
- * @memberOf ACL
+ * @memberOf Kontrolle
  * @param {string} rule - Add new rule to the rules map.
  * @param {Fn} requirement - Evaluation callback.
  * @returns {void}
@@ -195,16 +202,16 @@ function applyRules(rules: string | readonly string[], requirement: Fn) {
 }
 
 /**
- * Parse rules provided in the ACL initialization.
+ * Parse rules provided in the Kontrolle initialization.
  *
- * @memberOf ACL
- * @param {ACLRules} rules - List of rules provided by user.
+ * @memberOf Kontrolle
+ * @param {KontrolleRules} rules - List of rules provided by user.
  * @returns {void}
  */
-function parseRules(rules: ACLRules): void {
+function parseRules(rules: KontrolleRules): void {
   const { permissions, roles = null } = rules;
 
-  permissions.forEach((permission) =>
+  permissions.forEach((permission: Rule) =>
     applyRules(permission.rules, permission.requirement)
   );
 
@@ -214,28 +221,28 @@ function parseRules(rules: ACLRules): void {
 /**
  * Wrapper rules
  *
- * @memberOf ACL
- * @param {ACLRules} rules - List of rules provided by user.
- * @returns {ACLRules} List of rules provided by user.
+ * @memberOf Kontrolle
+ * @param {KontrolleRules} rules - List of rules provided by user.
+ * @returns {KontrolleRules} List of rules provided by user.
  */
-export function defineRules(rules: ACLRules): ACLRules {
+export function defineRules(rules: KontrolleRules): KontrolleRules {
   return rules;
 }
 
 /**
  * Initialization function
  *
- * @memberOf ACL
+ * @memberOf Kontrolle
  * @param {User} user - User object.
- * @param {ACLRules} rules - List of rules provided by user.
+ * @param {KontrolleRules} rules - List of rules provided by user.
  * @returns {void}
  */
-export function defineACL(user: User, rules: ACLRules): void {
-  _ACL.user = user;
+export function defineKontrolle(user: User, rules: KontrolleRules): void {
+  _Kontrolle.user = user;
   parseRules(rules);
 }
 
-export const ACL = {
+export const Kontrolle = {
   can: canRuleChecker,
   canAll: canRuleChecker,
   canAny: canAnyRuleChecker,

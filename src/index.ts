@@ -1,1 +1,1 @@
-export * from './lib/acl';
+export * from './lib/kontrolle';
