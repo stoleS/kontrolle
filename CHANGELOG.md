@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1](https://github.com/predrag-stosic/kontrolle/compare/v2.1.0...v0.1.1) (2024-03-06)
+
+
+### Features
+
+* update description ([3a89e3a](https://github.com/predrag-stosic/kontrolle/commit/3a89e3a281ef42ef9a221b781679b1671f57aaf1))
+
 ## 2.1.0 (2024-03-06)
 
 
