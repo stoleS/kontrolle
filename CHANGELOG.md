@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.3](https://github.com/stoleS/kontrolle/compare/v0.1.1...v0.1.3) (2024-03-06)
+
+
+### Bug Fixes
+
+* export types ([152e885](https://github.com/stoleS/kontrolle/commit/152e88516b3a3b6507e0536ea2c70c196c33b05f))
+* update git path ([46f70af](https://github.com/stoleS/kontrolle/commit/46f70af68bebb32f9c686909c8ed72180fb60bb0))
+
 ### [0.1.1](https://github.com/predrag-stosic/kontrolle/compare/v2.1.0...v0.1.1) (2024-03-06)
 
 
