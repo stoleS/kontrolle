@@ -1,7 +1,7 @@
 {
   "name": "kontrolle",
-  "version": "2.1.0",
-  "description": "ACL",
+  "version": "0.1.0",
+  "description": "Simple oppinionated ACL library",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
   "module": "build/module/index.js",
