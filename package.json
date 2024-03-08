@@ -42,7 +42,7 @@
     "node": ">=10"
   },
   "devDependencies": {
-    "@ava/typescript": "^1.1.1",
+    "@ava/typescript": "^4.1.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@typescript-eslint/eslint-plugin": "^4.0.1",
     "@typescript-eslint/parser": "^4.0.1",
@@ -80,7 +80,8 @@
     "typescript": {
       "rewritePaths": {
         "src/": "build/main/"
-      }
+      },
+      "compile": "tsc"
     },
     "files": [
       "!build/module/**"
